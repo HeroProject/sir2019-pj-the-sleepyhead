@@ -190,7 +190,7 @@ class SampleApplication(Base.AbstractApplication):
         polarity, subjectivity = sentence.sentiment
         category = 0
         # Invert subjectivity
-        subjectivity = - subjectivity + 1
+        # subjectivity = - subjectivity + 1
 
         # Assign category depending on sentiment
         if polarity > 0.7:  # Very positive
@@ -206,11 +206,24 @@ class SampleApplication(Base.AbstractApplication):
 
         categories_distribution = np.ones(5, dtype=float) * subjectivity / 5
         categories_distribution[category] += 1 - subjectivity
-        # categories_distribution[category] += 1 - subjectivity / 3
-        # categories_distribution[category] += 1 - subjectivity / 3
+
+        variance = 1 * subjectivity / 5
+        max_shift = np.max([abs(index - category) for index in range(len(categories_distribution))])
+        min_shift = 1 if category == 0 or category == 4 else 2
+        for index in range(len(categories_distribution)):
+            shift = abs(index - category)
+            if shift > 1:  # far from the choosen polarity.
+                categories_distribution[index] -= variance * shift * 0.2
+            elif min_shift == 2 and shift == 1:
+                categories_distribution[index] += variance * (max_shift - shift) * 0.1
+            else:
+                categories_distribution[index] += variance * (max_shift - shift) * 0.2
+
+        if (1.0 - sum(categories_distribution)) > 0.00001:
+            aux = (1.0 - sum(categories_distribution)) / 5
+            categories_distribution = [round(x + aux, 4) for x in categories_distribution]
 
         # Allow changing category depending on subjectivity
-
         best_category = np.random.choice(np.arange(5), 1, p=categories_distribution)[0]
 
         return random.choice(self.sentiment_to_gesture[best_category])
