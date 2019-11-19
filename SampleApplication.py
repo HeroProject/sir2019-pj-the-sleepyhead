@@ -1,5 +1,4 @@
 import AbstractApplication as Base
-import spacy
 import json
 from textblob import TextBlob
 import numpy as np
@@ -28,44 +27,95 @@ class SampleApplication(Base.AbstractApplication):
 
     def init_gestures(self):
         self.gesture_to_probability = {
-            "animations/Stand/Emotions/Negative/Fearful_1": [-0.718, 0.6],
-            "animations/Stand/BodyTalk/Speaking/BodyTalk_18": [-0.3, 0.7],
-            "animations/Stand/BodyTalk/BodyLanguage/NAO/Center_Slow_AFF_01": [0.1, 0.8],
-            "animations/Stand/BodyTalk/BodyLanguage/NAO/Center_Slow_AFF_03": [0.5, 0.6],
-            "animations/Stand/BodyTalk/Speaking/BodyTalk_11": [0.5, 0.6],
-            "animations/Stand/BodyTalk/Speaking/BodyTalk_17": [0.5, 0.8],
-            "animations/Stand/Emotions/Positive/Proud_2": [0.8, 0.85],
-            "animations/Stand/Emotions/Positive/Confident_1": [0.85, 0.87],
-            "animations/Stand/Exclamation/NAO/Center_Neutral_EXC_01": [0.46, 0.7],
-            "animations/Stand/Exclamation/NAO/Right_Strong_EXC_04": [0.85, 0, 8],
-            "animations/Stand/BodyTalk/Speaking/BodyTalk_5": [0.56, 0.67],
-            "animations/Stand/BodyTalk/Speaking/BodyTalk_4": [0.1, 0.89],
-            "animations/Stand/BodyTalk/BodyLanguage/NAO/Center_Strong_AFF_05": [-0.9, 0.87],
-            "animations/Stand/Self & others/NAO/Center_Neutral_SAO_03": [0, 0.75],
-            "animations/Stand/Gestures/Explain_4": [0, 0.75],
-            "animations/Stand/Gestures/Explain_1": [0, 0.75],
-            "animations/Stand/Emotions/Positive/Happy_4": [0.85, 0.87],
-            "animations/Stand/BodyTalk/BodyLanguage/NAO/Center_Strong_AFF_01": [0, 0.75],
-            "animations/Stand/Gestures/Explain_9": [0, 0.75],
-            "animations/Stand/Gestures/Explain_8": [0, 0.75],
-            "animations/Stand/Negation/NAO/Center_Strong_NEG_01": [0.67, 0.55],
-            "animations/Stand/Negation/NAO/Center_Strong_NEG_05": [-0.7, 0.67],
-            "animations/Stand/Self & others/NAO/Left_Neutral_SAO_01": [0, 0.75],
-            "animations/Stand/Self & others/NAO/Left_Neutral_SAO_02": [0.55, 0.75],
-            "animations/Stand/Self & others/NAO/Left_Strong_SAO_02": [0.55, 0.75],
-            "animations/Stand/Space & time/NAO/Right_Slow_SAT_01": [0.55, 0.75],
-            "animations/Stand/Exclamation/NAO/Left_Strong_EXC_03": [0.85, 0.87],
-            "animations/Stand/Gestures/Desperate_5": [-0.7, 0.67],
-            "animations/Stand/Gestures/Desperate_2": [-0.3, 0.7],
-            "animations/Stand/Emotions/Positive/Excited_1": [0.85, 0.87],
-            "animations/Stand/Gestures/You_3": [0, 0.75],
-            "animations/Stand/Emotions/Negative/Disappointed_1": [-0.9, 0.87],
-            "animations/Stand/Negation/NAO/Right_Strong_NEG_01": [-0.3, 0.7],
-            "animations/Stand/Emotions/Negative/Frustrated_1": [-0.7, 0.67],
-            "animations/Stand/Gestures/Explain_3": [0, 0.75],
-            "animations/Stand/BodyTalk/Speaking/BodyTalk_2": [0, 0.75],
-            "animations/Stand/Gestures/Desperate_1": [-0.9, 0.87],
-            "animations/Stand/Emotions/Positive/Sure_1": [-0.3, 0.7],
+            "animations/Stand/Emotions/Negative/Fearful_1": -2,
+            "animations/Stand/BodyTalk/Speaking/BodyTalk_18": -1,
+            "animations/Stand/BodyTalk/BodyLanguage/NAO/Center_Slow_AFF_01": 0,
+            "animations/Stand/BodyTalk/BodyLanguage/NAO/Center_Slow_AFF_03": 1,
+            "animations/Stand/BodyTalk/Speaking/BodyTalk_11": 1,
+            "animations/Stand/BodyTalk/Speaking/BodyTalk_17": 1,
+            "animations/Stand/Emotions/Positive/Proud_2": 2,
+            "animations/Stand/Emotions/Positive/Confident_1": 2,
+            "animations/Stand/Exclamation/NAO/Center_Neutral_EXC_01": 1,
+            "animations/Stand/Exclamation/NAO/Right_Strong_EXC_04": 2,
+            "animations/Stand/BodyTalk/Speaking/BodyTalk_5": 1,
+            "animations/Stand/BodyTalk/Speaking/BodyTalk_4": 0,
+            "animations/Stand/BodyTalk/BodyLanguage/NAO/Center_Strong_AFF_05": -2,
+            "animations/Stand/Self & others/NAO/Center_Neutral_SAO_03": 0,
+            "animations/Stand/Gestures/Explain_4": 0,
+            "animations/Stand/Gestures/Explain_1": 0,
+            "animations/Stand/Emotions/Positive/Happy_4": 1,
+            "animations/Stand/BodyTalk/BodyLanguage/NAO/Center_Strong_AFF_01": 0,
+            "animations/Stand/Gestures/Explain_9": 0,
+            "animations/Stand/Gestures/Explain_8": 0,
+            "animations/Stand/Negation/NAO/Center_Strong_NEG_01": 1,
+            "animations/Stand/Negation/NAO/Center_Strong_NEG_05": -2,
+            "animations/Stand/Self & others/NAO/Left_Neutral_SAO_01": 0,
+            "animations/Stand/Self & others/NAO/Left_Neutral_SAO_02": 1,
+            "animations/Stand/Self & others/NAO/Left_Strong_SAO_02": 1,
+            "animations/Stand/Space & time/NAO/Right_Slow_SAT_01": 1,
+            "animations/Stand/Exclamation/NAO/Left_Strong_EXC_03": 2,
+            "animations/Stand/Gestures/Desperate_5": -2,
+            "animations/Stand/Gestures/Desperate_2": -1,
+            "animations/Stand/Emotions/Positive/Excited_1": 2,
+            "animations/Stand/Gestures/You_3": 0,
+            "animations/Stand/Emotions/Negative/Disappointed_1": -2,
+            "animations/Stand/Negation/NAO/Right_Strong_NEG_01": -1,
+            "animations/Stand/Emotions/Negative/Frustrated_1": -2,
+            "animations/Stand/Gestures/Explain_3": 0,
+            "animations/Stand/BodyTalk/Speaking/BodyTalk_2": 0,
+            "animations/Stand/Gestures/Desperate_1": -2,
+            "animations/Stand/Emotions/Positive/Sure_1": -1,
+        }
+
+        self.sentiment_to_gesture = {
+            0: [
+                "animations/Stand/Emotions/Negative/Fearful_1",
+                "animations/Stand/BodyTalk/BodyLanguage/NAO/Center_Strong_AFF_05",
+                "animations/Stand/Negation/NAO/Center_Strong_NEG_05",
+                "animations/Stand/Gestures/Desperate_5",
+                "animations/Stand/Emotions/Negative/Disappointed_1",
+                "animations/Stand/Emotions/Negative/Frustrated_1",
+                "animations/Stand/Gestures/Desperate_1",
+            ],
+            1: [
+                "animations/Stand/BodyTalk/Speaking/BodyTalk_18",
+                "animations/Stand/Gestures/Desperate_2",
+                "animations/Stand/Negation/NAO/Right_Strong_NEG_01",
+                "animations/Stand/Emotions/Positive/Sure_1",
+            ],
+            2: [
+                "animations/Stand/BodyTalk/BodyLanguage/NAO/Center_Slow_AFF_01",
+                "animations/Stand/BodyTalk/Speaking/BodyTalk_4",
+                "animations/Stand/Self & others/NAO/Center_Neutral_SAO_03",
+                "animations/Stand/Gestures/Explain_4",
+                "animations/Stand/Gestures/Explain_1",
+                "animations/Stand/BodyTalk/BodyLanguage/NAO/Center_Strong_AFF_01",
+                "animations/Stand/Gestures/Explain_9",
+                "animations/Stand/Gestures/Explain_8",
+                "animations/Stand/Self & others/NAO/Left_Neutral_SAO_01",
+                "animations/Stand/Gestures/You_3",
+                "animations/Stand/Gestures/Explain_3",
+                "animations/Stand/BodyTalk/Speaking/BodyTalk_2",
+            ],
+            3: [
+                "animations/Stand/BodyTalk/BodyLanguage/NAO/Center_Slow_AFF_03",
+                "animations/Stand/BodyTalk/Speaking/BodyTalk_11",
+                "animations/Stand/BodyTalk/Speaking/BodyTalk_17",
+                "animations/Stand/Exclamation/NAO/Center_Neutral_EXC_01",
+                "animations/Stand/BodyTalk/Speaking/BodyTalk_5",
+                "animations/Stand/Emotions/Positive/Happy_4",
+                "animations/Stand/Negation/NAO/Center_Strong_NEG_01",
+                "animations/Stand/Self & others/NAO/Left_Neutral_SAO_02",
+                "animations/Stand/Self & others/NAO/Left_Strong_SAO_02",
+                "animations/Stand/Space & time/NAO/Right_Slow_SAT_01",
+            ],
+            4: [
+                "animations/Stand/Emotions/Positive/Proud_2",
+                "animations/Stand/Emotions/Positive/Confident_1",
+                "animations/Stand/Exclamation/NAO/Right_Strong_EXC_04",
+                "animations/Stand/Exclamation/NAO/Left_Strong_EXC_03",
+                "animations/Stand/Emotions/Positive/Excited_1",
+            ],
         }
 
         self.led_gestures = {
@@ -124,20 +174,46 @@ class SampleApplication(Base.AbstractApplication):
             "neutral": "white",
         }
         self.leds_to_emotion = {
-            "anger": [-0.5, 0.3],
-            "surprise": [0.5, 0.6],
-            "disgust": [-0.4, 0.4],
-            "sadness": [-0.5, 0.3],
-            "happiness": [1, 0.6],
-            "fear": [-0.5, 0.4],
-            "neutral": [0, 0.0],
+            "anger": -1,
+            "surprise": 1,
+            "disgust": -1,
+            "sadness": -1,
+            "happiness": 2,
+            "fear": -1,
+            "neutral": 0,
         }
 
         # does it make sense to use linear regression?
 
     def chooseGesture(self, sentence, policy=random):
         # Use an epsilon greedy policy. Meaning we will choose the given polarity a subjetivity porcent of the time.
-        return random.choice(self.gesture_list)
+        polarity, subjectivity = sentence.sentiment
+        category = 0
+        # Invert subjectivity
+        subjectivity = - subjectivity + 1
+
+        # Assign category depending on sentiment
+        if polarity > 0.7:  # Very positive
+            category = 4
+        elif polarity < -0.7:  # Very negative
+            category = 0
+        elif polarity > 0.2 and polarity < 0.7:  # Positive
+            category = 3
+        elif polarity < -0.2 and polarity > -0.7:  # Negative
+            category = 1
+        else:  # Neutral
+            category = 2
+
+        categories_distribution = np.ones(5, dtype=float) * subjectivity / 5
+        categories_distribution[category] += 1 - subjectivity
+        # categories_distribution[category] += 1 - subjectivity / 3
+        # categories_distribution[category] += 1 - subjectivity / 3
+
+        # Allow changing category depending on subjectivity
+
+        best_category = np.random.choice(np.arange(5), 1, p=categories_distribution)[0]
+
+        return random.choice(self.sentiment_to_gesture[best_category])
 
     def main(self):
         self.init_stories(36)
@@ -147,14 +223,25 @@ class SampleApplication(Base.AbstractApplication):
         self.setLanguage("en-US")
         self.init_locks()
 
+        # very_bad = [x for x in self.gesture_to_probability if self.gesture_to_probability[x] == -2]
+        # bad = [x for x in self.gesture_to_probability if self.gesture_to_probability[x] == -1]
+        # neutral = [x for x in self.gesture_to_probability if self.gesture_to_probability[x] == 0]
+        # good = [x for x in self.gesture_to_probability if self.gesture_to_probability[x] == 1]
+        # very_good = [x for x in self.gesture_to_probability if self.gesture_to_probability[x] == 2]
+        # print(very_bad)
+        # print(bad)
+        # print(good)
+        # print(very_good)
+        # print(neutral)
+
         for sent in self.sentences:
             processedsent = "\\rspd=80\\" + sent.string
-            # print(processedsent)
-            self.say(processedsent)
+            print(processedsent)
+            # self.say(processedsent)
             gesture = self.chooseGesture(sent)
-            self.doGesture(gesture)
-            self.speechLock.acquire()
-            # print(gesture + "\n")
+            # self.doGesture(gesture)
+            # self.speechLock.acquire()
+            print(gesture + "\n")
 
         # SpaCy testing
         # nlp = spacy.load("en_core_web_sm")
