@@ -3,6 +3,7 @@
     {
       "number": "01",
       "title": "THE WOLF AND THE KID",
+      "genre" : "adventure",
       "story": [
         "There was once a little Kid whose growing horns made him think he was a grown-up Billy Goat and able to take care of himself.",
         "So one evening when the flock started home from the pasture and his mother called, the Kid paid no heed and kept right on nibbling the tender grass.",
@@ -30,6 +31,7 @@
 
     {
       "number": "02",
+      "genre": "mistery",
       "title": "THE TORTOISE AND THE DUCKS",
       "story": [
         "The Tortoise, you know, carries his house on his back.",
@@ -53,6 +55,7 @@
 
     {
       "number": "03",
+      "genre": "romance",
       "title": "THE YOUNG CRAB AND HIS MOTHER",
       "story":[
         "Why in the world do you walk sideways like that?",
@@ -70,6 +73,7 @@
     {
       "number": "04",
       "title": "The Frogs and the Ox",
+      "genre": "fantasy",
       "story":[
         "An Ox came down to a reedy pool to drink.",
         "As he splashed heavily into the water, he crushed a young Frog into the mud.",
@@ -89,6 +93,7 @@
 
     {
       "number": "05",
+      "genre": "historical",
       "title": "The Dog, the Cock, and the Fox",
       "story":[
         "A Dog and a Cock, who were the best of friends, wished very much to see something of the world.",
@@ -136,6 +141,7 @@
     {
       "number": "07",
       "title": "The Eagle and the Jackdaw",
+      "genre": "adventure",
       "story":[
         "An Eagle, swooping down on powerful wings, seized a lamb in her talons and made off with it to her nest.",
         "A Jackdaw saw the deed, and his silly head was filled with the idea that he was big and strong enough to do as the Eagle had done.",

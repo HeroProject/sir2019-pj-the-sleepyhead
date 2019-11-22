@@ -15,7 +15,7 @@ class DialogFlowSampleApplication(Base.AbstractApplication):
 
         # Make the robot ask the question, and wait until it is done speaking
         self.speechLock = Semaphore(0)
-        self.sayAnimated('Hello, what is your name?')
+        self.sayAnimated('Hello, I am PJ! what is your name?')
         self.speechLock.acquire()
 
         # Listen for an answer for at most 5 seconds

@@ -7,13 +7,27 @@ import random
 
 
 class SampleApplication(Base.AbstractApplication):
+
+    # Pass the required Dialogflow parameters (add your Dialogflow parameters)
+    def init_settings(self):
+        self.setDialogflowKey("nao-asipei-148b2e2fe841.json")
+        self.setDialogflowAgent("nao-asipei")
+
+    # Make the robot ask the question, and wait until it is done speaking
+
     def init_locks(self):
         self.speechLock = Semaphore(0)
+        self.nameLock = Semaphore(0)
+        self.genreLock = Semaphore(0)
 
-    def init_stories(self, id=10):
-        with open("aesopFables.json") as file:
+    def init_stories(self, genre):
+        genre = genre.lower()
+        with open("fables.json") as file:
             dataset = json.load(file)["stories"]
-        self.story = dataset[id]
+        for story in dataset:
+            if story["genre"] == genre:
+                self.story = story
+                break
         self.blob = TextBlob(" ".join(self.story["story"]))
         self.sentences = self.blob.sentences
         processed_story = [
@@ -173,17 +187,22 @@ class SampleApplication(Base.AbstractApplication):
             "fear": "cyan",
             "neutral": "white",
         }
-        self.leds_to_emotion = {
-            "anger": -1,
-            "surprise": 1,
-            "disgust": -1,
-            "sadness": -1,
-            "happiness": 2,
-            "fear": -1,
-            "neutral": 0,
+        self.emotion_to_led = {
+            0: ["anger", "sadness"],
+            1: ["disgust", "fear"],
+            2: ["neutral"],
+            3: ["surprise"],
+            4: ["happiness"],
         }
-
-        # does it make sense to use linear regression?
+        self.leds_to_emotion = {
+            "anger": 2,
+            "surprise": 3,
+            "disgust": 1,
+            "sadness": 0,
+            "happiness": 4,
+            "fear": 1,
+            "neutral": 2,
+        }
 
     def chooseGesture(self, sentence, policy=random):
         # Use an epsilon greedy policy. Meaning we will choose the given polarity a subjetivity porcent of the time.
@@ -226,10 +245,13 @@ class SampleApplication(Base.AbstractApplication):
         # Allow changing category depending on subjectivity
         best_category = np.random.choice(np.arange(5), 1, p=categories_distribution)[0]
 
-        return random.choice(self.sentiment_to_gesture[best_category])
+        return (
+            random.choice(self.sentiment_to_gesture[best_category]),
+            random.choice(self.emotion_to_led[best_category]),
+        )
 
     def main(self):
-        self.init_stories(36)
+        # self.init_stories("adventure")
         self.init_gestures()
         self.init_gesture_list()
         self.init_leds_gestures()
@@ -247,14 +269,68 @@ class SampleApplication(Base.AbstractApplication):
         # print(very_good)
         # print(neutral)
 
+        self.sayAnimated("Hello, I am PJ! what is your name?")
+        self.speechLock.acquire()
+
+        # Listen for an answer for at most 5 seconds
+        self.name = None
+        self.setAudioContext("answer_name")
+        self.startListening()
+        self.nameLock.acquire(timeout=5)
+        self.stopListening()
+        if not self.name:  # wait one more second after stopListening (if needed)
+            self.nameLock.acquire(timeout=1)
+
+        # Respond and wait for that to finish
+        if self.name:
+            self.sayAnimated(" \\rspd=80\\ Nice to meet you " + self.name + "!")
+        else:
+            self.sayAnimated("\\rspd=80\\ Sorry, I didn't catch your name. I'm gonna call you Bob")
+            self.name = "Bob"  # Change this please
+        # self.speechLock.acquire()
+
+        self.genreList = ["adventure", "mistery", "fantasy", "romance", "historical"]
+
+        self.sayAnimated(
+            "\\rspd=80\\Okay"
+            + self.name
+            + "What kind of story would you like to here tonight? Today I have Adventure, Mistery, Fantasy, Romance and Historical"
+        )
+        self.speechLock.acquire()
+
+        self.genreLock = Semaphore(0)
+        self.genre = None
+        self.setAudioContext("answer_genre")
+        self.startListening()
+        self.genreLock.acquire(timeout=5)
+        self.stopListening()
+        if not self.genre:  # wait one more second after stopListening (if needed)
+            self.genreLock.acquire(timeout=1)
+
+        # Respond and wait for that to finish
+        if self.genre:
+            self.sayAnimated("\\rspd=80\\Okay," + self.genre + "it is!")
+        else:
+            self.genre = random.choice(self.genreList)
+            self.sayAnimated(
+                "\\rspd=80\\I didn't get it, so we are doing one of my favorite genres " + self.genre
+            )
+
+        # We have his name and the kind of story. Init story
+        self.init_stories(self.genre)
+        # self.sayAnimated(self.story["title"])
         for sent in self.sentences:
             processedsent = "\\rspd=80\\" + sent.string
             print(processedsent)
-            # self.say(processedsent)
-            gesture = self.chooseGesture(sent)
-            # self.doGesture(gesture)
-            # self.speechLock.acquire()
+            self.say(processedsent)
+            gesture, led = self.chooseGesture(sent)
+            self.doGesture(gesture)
+            if not self.led_gestures[gesture]:
+                self.setEyeColour(self.led_gesture[led])
+                print(self.led_gesture[led])
+            self.speechLock.acquire()
             print(gesture + "\n")
+        # self.sayAnimated(self.story["moral"])
 
         # SpaCy testing
         # nlp = spacy.load("en_core_web_sm")
@@ -269,6 +345,14 @@ class SampleApplication(Base.AbstractApplication):
     def onRobotEvent(self, event):
         if event == "TextDone":
             self.speechLock.release()
+
+    def onAudioIntent(self, *args, intentName):
+        if intentName == "answer_name" and len(args) > 0:
+            self.name = args[0]
+            self.nameLock.release()
+        elif intentName == "answer_genre" and len(args) > 0:
+            self.genre = args[0]
+            self.genreLock.release()
 
 
 # Run the application
