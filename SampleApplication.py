@@ -22,11 +22,14 @@ class SampleApplication(Base.AbstractApplication):
         self.nameLock = Semaphore(0)
         self.genreLock = Semaphore(0)
 
-    def init_stories(self, genre):
-        genre = genre.lower()
+    def init_stories(self):
         with open("fables.json") as file:
-            dataset = json.load(file)["stories"]
-        for story in dataset:
+            self.dataset = json.load(file)["stories"]
+
+    def select_story(self, genre):
+        genre = genre.lower()
+        np.random.shuffle(self.dataset)
+        for story in self.dataset:
             if story["genre"] == genre:
                 self.story = story
                 break
@@ -35,7 +38,6 @@ class SampleApplication(Base.AbstractApplication):
         processed_story = [
             " \\mrk=" + str(i + 2) + "\\ " + str(self.sentences[i]) for i in range(len(self.sentences))
         ]
-
         self.story["story"] = self.speed + "".join(processed_story)
 
     def init_gesture_list(self):
@@ -206,6 +208,27 @@ class SampleApplication(Base.AbstractApplication):
             "neutral": 2,
         }
 
+    def tell_stories(self, genre):
+        # We have his name and the kind of story. Init story
+        self.select_story(genre)
+        # self.init_stories("fantasy")
+        self.sayAnimated(self.speed + "The story I'm going to tell is " + self.story["title"])
+        self.speechLock.acquire()
+        for sent in self.sentences:
+            processedsent = self.speed + sent.string
+            print(processedsent)
+            self.say(processedsent)
+            gesture, led = self.chooseGesture(sent)
+            print(gesture + "\n")
+            self.doGesture(gesture)
+            if not self.led_gestures[gesture]:
+                self.setEyeColour(self.led_gesture[led])
+                print(self.led_gesture[led])
+            self.speechLock.acquire()
+
+        self.sayAnimated(self.speed + "The moral of the story is " + self.story["moral"])
+        self.speechLock.acquire()
+
     def chooseGesture(self, sentence):
         # Use an epsilon greedy policy. Meaning we will choose the given polarity a subjetivity porcent of the time.
         polarity, subjectivity = sentence.sentiment
@@ -253,7 +276,7 @@ class SampleApplication(Base.AbstractApplication):
         )
 
     def main(self):
-        # self.init_stories("adventure")
+        self.init_stories()
         self.init_settings()
         self.init_gestures()
         self.init_gesture_list()
@@ -279,6 +302,7 @@ class SampleApplication(Base.AbstractApplication):
         self.name = None
         count = 0
         while not self.name and count < 2:
+            count += 1
             self.setAudioContext("answer_name")
             self.startListening()
             self.nameLock.acquire(timeout=5)
@@ -293,55 +317,72 @@ class SampleApplication(Base.AbstractApplication):
                 if count < 2:
                     self.sayAnimated("Sorry, I didn't catch your name. Can you repeat it?")
                 else:
-                    self.sayAnimated("Sorry, I didn't catch your name, but I will tell you a story anyway <3")
+                    self.sayAnimated("Sorry, I didn't catch your name, but I will tell you a story anyway")
+                    self.name = ""
             # self.name = "Bob"  # Change this please
             self.speechLock.acquire()
-            count += 1
 
         self.sayAnimated(
             self.speed
-            + "Okay"
+            + "Okay "
             + self.name
-            + "What kind of story would you like to here tonight? Today I have Adventure, Mistery, Fantasy, Romance and Historical"
+            + " What kind of story would you like to here tonight? Today I have Adventure, Mistery, Fantasy, Romance and Historical"
         )
         self.speechLock.acquire()
 
+        count = 0
         self.genre = None
-        self.setAudioContext("answer_genre")
+        while not self.genre and count < 2:
+            self.setAudioContext("answer_genre")
+            self.startListening()
+            self.nameLock.acquire(timeout=5)
+            self.stopListening()
+            if not self.genre:  # wait one more second after stopListening (if needed)
+                self.nameLock.acquire(timeout=1)
+
+            # Respond and wait for that to finish
+            if self.genre:
+                self.sayAnimated(self.speed + "Okay," + self.genre + "it is!")
+            else:
+                if count < 2:
+                    self.sayAnimated("Sorry, I didn't catch it. Can you repeat it?")
+                else:
+                    self.genre = random.choice(self.genreList)
+                    self.sayAnimated(
+                        self.speed
+                        + "I didn't get it, so we are doing one of my favorite genres "
+                        + self.genre
+                    )
+            self.speechLock.acquire()
+
+        self.tell_stories(self.genre)
+
+        self.setEyeColour("white")
+        self.sayAnimated(
+            self.speed + "Oh well, its getting late now, would you like me to tell you another story?"
+        )
+        self.speechLock.acquire()
+
+        self.answer_exit = None
+        self.setAudioContext("answer_exit")
         self.startListening()
         self.nameLock.acquire(timeout=5)
         self.stopListening()
-        if not self.genre:  # wait one more second after stopListening (if needed)
+        if not self.answer_exit:  # wait one more second after stopListening (if needed)
             self.nameLock.acquire(timeout=1)
 
+        yes_list = ["yes", "yeah", "sure"]
         # Respond and wait for that to finish
-        if self.genre:
-            self.sayAnimated(self.speed + "Okay," + self.genre + "it is!")
+        if self.answer_exit:
+            if self.answer_exit in yes_list:
+                self.sayAnimated(self.speed + "Okay, then I will tell you another story")
+                self.speechLock.acquire()
+                self.tell_stories(self.genre)
+                self.sayAnimated(self.speed + "And now, Good night and sweet dreams.")
+                self.speechLock.acquire()
         else:
-            self.genre = random.choice(self.genreList)
-            self.sayAnimated(
-                self.speed + "I didn't get it, so we are doing one of my favorite genres " + self.genre
-            )
-        self.speechLock.acquire()
-
-        # We have his name and the kind of story. Init story
-        self.init_stories(self.genre)
-        # self.init_stories("fantasy")
-        self.sayAnimated("The story I'm going to tell is " + self.story["title"])
-        self.speechLock.acquire()
-        for sent in self.sentences:
-            processedsent = self.speed + sent.string
-            print(processedsent)
-            self.say(processedsent)
-            gesture, led = self.chooseGesture(sent)
-            self.doGesture(gesture)
-            if not self.led_gestures[gesture]:
-                self.setEyeColour(self.led_gesture[led])
-                print(self.led_gesture[led])
+            self.sayAnimated(self.speed + "Good night, sweet dreams")
             self.speechLock.acquire()
-            print(gesture + "\n")
-        self.sayAnimated(self.speed + "The moral of the story is " + self.story["moral"])
-        self.speechLock.acquire()
 
     def onRobotEvent(self, event):
         if event == "TextDone":
@@ -353,6 +394,9 @@ class SampleApplication(Base.AbstractApplication):
             self.nameLock.release()
         elif intentName == "answer_genre" and len(args) > 0:
             self.genre = args[0]
+            self.nameLock.release()
+        elif intentName == "answer_exit" and len(args) > 0:
+            self.answer_exit = args[0]
             self.nameLock.release()
 
 
