@@ -12,6 +12,8 @@ class SampleApplication(Base.AbstractApplication):
     def init_settings(self):
         self.setDialogflowKey("nao-asipei-148b2e2fe841.json")
         self.setDialogflowAgent("nao-asipei")
+        self.speed = "\\rspd=80\\"
+        self.genreList = ["adventure", "mystery", "fantasy", "romance", "historical"]
 
     # Make the robot ask the question, and wait until it is done speaking
 
@@ -34,7 +36,7 @@ class SampleApplication(Base.AbstractApplication):
             " \\mrk=" + str(i + 2) + "\\ " + str(self.sentences[i]) for i in range(len(self.sentences))
         ]
 
-        self.story["story"] = "\\rspd=80\\" + "".join(processed_story)
+        self.story["story"] = self.speed + "".join(processed_story)
 
     def init_gesture_list(self):
         self.gesture_list = list(self.gesture_to_probability.keys())
@@ -204,7 +206,7 @@ class SampleApplication(Base.AbstractApplication):
             "neutral": 2,
         }
 
-    def chooseGesture(self, sentence, policy=random):
+    def chooseGesture(self, sentence):
         # Use an epsilon greedy policy. Meaning we will choose the given polarity a subjetivity porcent of the time.
         polarity, subjectivity = sentence.sentiment
         category = 0
@@ -238,9 +240,9 @@ class SampleApplication(Base.AbstractApplication):
             else:
                 categories_distribution[index] += variance * (max_shift - shift) * 0.2
 
-        if (1.0 - sum(categories_distribution)) > 0.00001:
+        if (np.abs(1.0 - sum(categories_distribution))) > 0.00001:
             aux = (1.0 - sum(categories_distribution)) / 5
-            categories_distribution = [round(x + aux, 4) for x in categories_distribution]
+            categories_distribution = [x + aux for x in categories_distribution]
 
         # Allow changing category depending on subjectivity
         best_category = np.random.choice(np.arange(5), 1, p=categories_distribution)[0]
@@ -252,6 +254,7 @@ class SampleApplication(Base.AbstractApplication):
 
     def main(self):
         # self.init_stories("adventure")
+        self.init_settings()
         self.init_gestures()
         self.init_gesture_list()
         self.init_leds_gestures()
@@ -274,53 +277,60 @@ class SampleApplication(Base.AbstractApplication):
 
         # Listen for an answer for at most 5 seconds
         self.name = None
-        self.setAudioContext("answer_name")
-        self.startListening()
-        self.nameLock.acquire(timeout=5)
-        self.stopListening()
-        if not self.name:  # wait one more second after stopListening (if needed)
-            self.nameLock.acquire(timeout=1)
+        count = 0
+        while not self.name and count < 2:
+            self.setAudioContext("answer_name")
+            self.startListening()
+            self.nameLock.acquire(timeout=5)
+            self.stopListening()
+            if not self.name:  # wait one more second after stopListening (if needed)
+                self.nameLock.acquire(timeout=1)
 
-        # Respond and wait for that to finish
-        if self.name:
-            self.sayAnimated(" \\rspd=80\\ Nice to meet you " + self.name + "!")
-        else:
-            self.sayAnimated("\\rspd=80\\ Sorry, I didn't catch your name. I'm gonna call you Bob")
-            self.name = "Bob"  # Change this please
-        # self.speechLock.acquire()
-
-        self.genreList = ["adventure", "mistery", "fantasy", "romance", "historical"]
+            # Respond and wait for that to finish
+            if self.name:
+                self.sayAnimated("Nice to meet you " + self.name + "!")
+            else:
+                if count < 2:
+                    self.sayAnimated("Sorry, I didn't catch your name. Can you repeat it?")
+                else:
+                    self.sayAnimated("Sorry, I didn't catch your name, but I will tell you a story anyway <3")
+            # self.name = "Bob"  # Change this please
+            self.speechLock.acquire()
+            count += 1
 
         self.sayAnimated(
-            "\\rspd=80\\Okay"
+            self.speed
+            + "Okay"
             + self.name
             + "What kind of story would you like to here tonight? Today I have Adventure, Mistery, Fantasy, Romance and Historical"
         )
         self.speechLock.acquire()
 
-        self.genreLock = Semaphore(0)
         self.genre = None
         self.setAudioContext("answer_genre")
         self.startListening()
-        self.genreLock.acquire(timeout=5)
+        self.nameLock.acquire(timeout=5)
         self.stopListening()
         if not self.genre:  # wait one more second after stopListening (if needed)
-            self.genreLock.acquire(timeout=1)
+            self.nameLock.acquire(timeout=1)
 
         # Respond and wait for that to finish
         if self.genre:
-            self.sayAnimated("\\rspd=80\\Okay," + self.genre + "it is!")
+            self.sayAnimated(self.speed + "Okay," + self.genre + "it is!")
         else:
             self.genre = random.choice(self.genreList)
             self.sayAnimated(
-                "\\rspd=80\\I didn't get it, so we are doing one of my favorite genres " + self.genre
+                self.speed + "I didn't get it, so we are doing one of my favorite genres " + self.genre
             )
+        self.speechLock.acquire()
 
         # We have his name and the kind of story. Init story
         self.init_stories(self.genre)
-        # self.sayAnimated(self.story["title"])
+        # self.init_stories("fantasy")
+        self.sayAnimated("The story I'm going to tell is " + self.story["title"])
+        self.speechLock.acquire()
         for sent in self.sentences:
-            processedsent = "\\rspd=80\\" + sent.string
+            processedsent = self.speed + sent.string
             print(processedsent)
             self.say(processedsent)
             gesture, led = self.chooseGesture(sent)
@@ -330,17 +340,8 @@ class SampleApplication(Base.AbstractApplication):
                 print(self.led_gesture[led])
             self.speechLock.acquire()
             print(gesture + "\n")
-        # self.sayAnimated(self.story["moral"])
-
-        # SpaCy testing
-        # nlp = spacy.load("en_core_web_sm")
-        # doc = nlp(str(self.story))
-        # entities = [(i, i.label_, i.label) for i in doc.ents]
-
-        # print(entities)
-        # self.sayAnimated(" \\rspd=85\\ \\mrk=1\\ " + str(self.story["title"]))
-        # self.sayAnimated(str(self.story["story"]))
-        # sleep(2)
+        self.sayAnimated(self.speed + "The moral of the story is " + self.story["moral"])
+        self.speechLock.acquire()
 
     def onRobotEvent(self, event):
         if event == "TextDone":
@@ -352,7 +353,7 @@ class SampleApplication(Base.AbstractApplication):
             self.nameLock.release()
         elif intentName == "answer_genre" and len(args) > 0:
             self.genre = args[0]
-            self.genreLock.release()
+            self.nameLock.release()
 
 
 # Run the application
