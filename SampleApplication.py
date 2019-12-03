@@ -4,6 +4,7 @@ from textblob import TextBlob
 import numpy as np
 from threading import Semaphore
 import random
+import time
 
 
 class SampleApplication(Base.AbstractApplication):
@@ -14,13 +15,14 @@ class SampleApplication(Base.AbstractApplication):
         self.setDialogflowAgent("nao-asipei")
         self.speed = "\\rspd=80\\"
         self.genreList = ["adventure", "mystery", "fantasy", "romance", "historical"]
+        self.init_time = 0
+        self.timing = 0
 
     # Make the robot ask the question, and wait until it is done speaking
 
     def init_locks(self):
         self.speechLock = Semaphore(0)
         self.nameLock = Semaphore(0)
-        self.genreLock = Semaphore(0)
 
     def init_stories(self):
         with open("fables.json") as file:
@@ -211,10 +213,14 @@ class SampleApplication(Base.AbstractApplication):
     def tell_stories(self, genre):
         # We have his name and the kind of story. Init story
         self.select_story(genre)
-        # self.init_stories("fantasy")
+        # Get when we start telling the story
+        self.init_time = time.time()
         self.sayAnimated(self.speed + "The story I'm going to tell is " + self.story["title"])
         self.speechLock.acquire()
         for sent in self.sentences:
+            print(self.timing - self.init_time == 61)
+            if self.timing - self.init_time == 61:
+                break
             processedsent = self.speed + sent.string
             print(processedsent)
             self.say(processedsent)
@@ -225,6 +231,7 @@ class SampleApplication(Base.AbstractApplication):
                 self.setEyeColour(self.led_gesture[led])
                 print(self.led_gesture[led])
             self.speechLock.acquire()
+            self.timing = time.time()
 
         self.sayAnimated(self.speed + "The moral of the story is " + self.story["moral"])
         self.speechLock.acquire()
@@ -283,17 +290,6 @@ class SampleApplication(Base.AbstractApplication):
         self.init_leds_gestures()
         self.setLanguage("en-US")
         self.init_locks()
-
-        # very_bad = [x for x in self.gesture_to_probability if self.gesture_to_probability[x] == -2]
-        # bad = [x for x in self.gesture_to_probability if self.gesture_to_probability[x] == -1]
-        # neutral = [x for x in self.gesture_to_probability if self.gesture_to_probability[x] == 0]
-        # good = [x for x in self.gesture_to_probability if self.gesture_to_probability[x] == 1]
-        # very_good = [x for x in self.gesture_to_probability if self.gesture_to_probability[x] == 2]
-        # print(very_bad)
-        # print(bad)
-        # print(good)
-        # print(very_good)
-        # print(neutral)
 
         self.sayAnimated("Hello, I am PJ! what is your name?")
         self.speechLock.acquire()
@@ -379,9 +375,11 @@ class SampleApplication(Base.AbstractApplication):
                 self.speechLock.acquire()
                 self.tell_stories(self.genre)
                 self.sayAnimated(self.speed + "And now, Good night and sweet dreams.")
+                self.doGesture("animations/Stand/Gestures/BowShort_1")
                 self.speechLock.acquire()
         else:
             self.sayAnimated(self.speed + "Good night, sweet dreams")
+            self.doGesture("animations/Stand/Gestures/BowShort_1")
             self.speechLock.acquire()
 
     def onRobotEvent(self, event):
