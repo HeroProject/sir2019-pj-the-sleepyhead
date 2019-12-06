@@ -214,13 +214,9 @@ class SampleApplication(Base.AbstractApplication):
         # We have his name and the kind of story. Init story
         self.select_story(genre)
         # Get when we start telling the story
-        self.init_time = time.time()
         self.sayAnimated(self.speed + "The story I'm going to tell is " + self.story["title"])
         self.speechLock.acquire()
         for sent in self.sentences:
-            print(self.timing - self.init_time == 61)
-            if self.timing - self.init_time > 60:
-                break
             processedsent = self.speed + sent.string
             print(processedsent)
             self.say(processedsent)
@@ -231,7 +227,6 @@ class SampleApplication(Base.AbstractApplication):
                 self.setEyeColour(self.led_gesture[led])
                 print(self.led_gesture[led])
             self.speechLock.acquire()
-            self.timing = time.time()
 
         self.sayAnimated(self.speed + "The moral of the story is " + self.story["moral"])
         self.speechLock.acquire()
@@ -378,10 +373,10 @@ class SampleApplication(Base.AbstractApplication):
                 self.sayAnimated(self.speed + "And now, Good night and sweet dreams.")
                 self.doGesture("animations/Stand/Gestures/BowShort_1")
                 self.speechLock.acquire()
-        else:
-            self.sayAnimated(self.speed + "Good night, sweet dreams")
-            self.doGesture("animations/Stand/Gestures/BowShort_1")
-            self.speechLock.acquire()
+            else:
+                self.sayAnimated(self.speed + "Good night, sweet dreams")
+                self.doGesture("animations/Stand/Gestures/BowShort_1")
+                self.speechLock.acquire()
 
     def onRobotEvent(self, event):
         if event == "TextDone":
