@@ -329,6 +329,7 @@ class SampleApplication(Base.AbstractApplication):
         count = 0
         self.genre = None
         while not self.genre and count < 2:
+            count +=1
             self.setAudioContext("answer_genre")
             self.startListening()
             self.nameLock.acquire(timeout=5)
