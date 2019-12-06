@@ -214,9 +214,13 @@ class SampleApplication(Base.AbstractApplication):
         # We have his name and the kind of story. Init story
         self.select_story(genre)
         # Get when we start telling the story
+        # self.init_time = time.time()
         self.sayAnimated(self.speed + "The story I'm going to tell is " + self.story["title"])
         self.speechLock.acquire()
         for sent in self.sentences:
+            # print(self.timing - self.init_time == 61)
+            # if self.timing - self.init_time > 60:
+            #     break
             processedsent = self.speed + sent.string
             print(processedsent)
             self.say(processedsent)
@@ -227,6 +231,7 @@ class SampleApplication(Base.AbstractApplication):
                 self.setEyeColour(self.led_gesture[led])
                 print(self.led_gesture[led])
             self.speechLock.acquire()
+            # self.timing = time.time()
 
         self.sayAnimated(self.speed + "The moral of the story is " + self.story["moral"])
         self.speechLock.acquire()
@@ -355,28 +360,41 @@ class SampleApplication(Base.AbstractApplication):
         )
         self.speechLock.acquire()
 
+        count = 0
         self.answer_exit = None
-        self.setAudioContext("answer_exit")
-        self.startListening()
-        self.nameLock.acquire(timeout=5)
-        self.stopListening()
-        if not self.answer_exit:  # wait one more second after stopListening (if needed)
-            self.nameLock.acquire(timeout=1)
+        while not self.answer_exit and count < 2:
+            count += 1
+            self.setAudioContext("answer_exit")
+            self.startListening()
+            self.nameLock.acquire(timeout=5)
+            self.stopListening()
+            if not self.answer_exit:  # wait one more second after stopListening (if needed)
+                self.nameLock.acquire(timeout=1)
 
-        yes_list = ["yes", "yeah", "sure"]
-        # Respond and wait for that to finish
-        if self.answer_exit:
-            if self.answer_exit in yes_list:
-                self.sayAnimated(self.speed + "Okay, then I will tell you another story")
-                self.speechLock.acquire()
-                self.tell_stories(self.genre)
-                self.sayAnimated(self.speed + "And now, Good night and sweet dreams.")
-                self.doGesture("animations/Stand/Gestures/BowShort_1")
-                self.speechLock.acquire()
+            yes_list = ["yes", "yeah", "sure"]
+            # Respond and wait for that to finish
+            if self.answer_exit:
+                if self.answer_exit in yes_list:
+                    self.sayAnimated(self.speed + "Okay, then I will tell you another story")
+                    self.speechLock.acquire()
+                    self.tell_stories(self.genre)
+                    self.sayAnimated(self.speed + "And now, Good night and sweet dreams.")
+                    self.doGesture("animations/Stand/Gestures/BowShort_1")
+                    self.speechLock.acquire()
+                else:
+                    self.sayAnimated(self.speed + "Good night, sweet dreams")
+                    self.doGesture("animations/Stand/Gestures/BowShort_1")
+                    self.speechLock.acquire()
             else:
-                self.sayAnimated(self.speed + "Good night, sweet dreams")
-                self.doGesture("animations/Stand/Gestures/BowShort_1")
-                self.speechLock.acquire()
+                if count < 2:
+                    self.sayAnimated("Sorry, I didn't catch your answer. Can you repeat it?")
+                else:
+                    self.sayAnimated(
+                        self.speed
+                        + "I suppose you fell asleep.. Good night, sweet dreams"
+                    )
+                    self.doGesture("animations/Stand/Gestures/BowShort_1")
+            self.speechLock.acquire()
 
     def onRobotEvent(self, event):
         if event == "TextDone":
