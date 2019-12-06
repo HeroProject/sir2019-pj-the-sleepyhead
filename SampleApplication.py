@@ -14,7 +14,7 @@ class SampleApplication(Base.AbstractApplication):
         self.setDialogflowKey("nao-asipei-148b2e2fe841.json")
         self.setDialogflowAgent("nao-asipei")
         self.speed = "\\rspd=80\\"
-        self.genreList = ["adventure", "mystery", "fantasy", "romance", "historical"]
+        self.genreList = ["adventure", "mistery", "fantasy", "romance", "historical"]
         self.init_time = 0
         self.timing = 0
 
@@ -219,7 +219,7 @@ class SampleApplication(Base.AbstractApplication):
         self.speechLock.acquire()
         for sent in self.sentences:
             print(self.timing - self.init_time == 61)
-            if self.timing - self.init_time == 61:
+            if self.timing - self.init_time > 60:
                 break
             processedsent = self.speed + sent.string
             print(processedsent)

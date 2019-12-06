@@ -30,7 +30,7 @@
         },
         {
             "number": "02",
-            "genre": "mystery",
+            "genre": "mistery",
             "title": "THE TORTOISE AND THE DUCKS",
             "story": [
                 "The Tortoise, you know, carries his house on his back.",
@@ -314,7 +314,7 @@
             ],
             "moral": "They complain most who suffer least.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "17",
@@ -391,7 +391,7 @@
             ],
             "moral": "Our best blessings are often the least appreciated.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "21",
@@ -511,7 +511,7 @@
             ],
             "moral": "Flattery is not a proof of true admiration.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "27",
@@ -547,7 +547,7 @@
             ],
             "moral": "Better to yield when it is folly to resist, than to resist stubbornly and be destroyed.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "29",
@@ -572,7 +572,7 @@
             ],
             "moral": "A resemblance to the great in some things does not make us great.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "30",
@@ -601,7 +601,7 @@
             ],
             "moral": "In a pinch a good use of our wits may help us out.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "32",
@@ -712,7 +712,7 @@
             ],
             "moral": "Deeds count, not boasting words.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "39",
@@ -841,7 +841,7 @@
             ],
             "moral": "The unjust will not listen to the reasoning of the innocent.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "46",
@@ -858,7 +858,7 @@
             ],
             "moral": "A knave's hypocrisy is easily seen through.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "47",
@@ -873,7 +873,7 @@
             ],
             "moral": "However unfortunate we may think we are there is always someone worse off than ourselves.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "48",
@@ -1000,7 +1000,7 @@
             ],
             "moral": "Do not depend on the promises of those whose interest it is to deceive you.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "55",
@@ -1309,7 +1309,7 @@
             ],
             "moral": "The laws of nature are unchangeable.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "72",
@@ -1422,7 +1422,7 @@
             ],
             "moral": "Bluff and threatening words are of little value with rascals.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "78",
@@ -1527,7 +1527,7 @@
             ],
             "moral": "Learn from my fate not to take pity on a scoundrel.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "84",
@@ -1729,7 +1729,7 @@
             ],
             "moral": "An act of kindness is well repaid.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "95",
@@ -1745,7 +1745,7 @@
             ],
             "moral": "The evil doer often comes to harm through his own deceit.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "96",
@@ -1797,7 +1797,7 @@
             ],
             "moral": "Take warning from the misfortunes of others.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "99",
@@ -1855,7 +1855,7 @@
             ],
             "moral": "Do not count your chickens before they are hatched.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "102",
@@ -1905,7 +1905,7 @@
             ],
             "moral": "A possession is worth no more than the use we make of it.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "105",
@@ -2021,7 +2021,7 @@
             ],
             "moral": "Do not listen to the advice of him who seeks to lower you to his own level.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "110",
@@ -2309,7 +2309,7 @@
             ],
             "moral": "We are often not so eager for what we seek, after we have found it.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "126",
@@ -2442,7 +2442,7 @@
             ],
             "moral": "The flatterer lives at the expense of those who will listen to him.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "132",
@@ -2557,7 +2557,7 @@
             ],
             "moral": "Friends in fine weather only, are not worth much.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "138",
@@ -2682,7 +2682,7 @@
             ],
             "moral": "Do not give up friends for foes.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         },
         {
             "number": "145",
@@ -2748,7 +2748,7 @@
             ],
             "moral": "Pride goes before a fall.",
             "characters": [],
-            "genre": "mystery"
+            "genre": "mistery"
         }
     ]
 }
