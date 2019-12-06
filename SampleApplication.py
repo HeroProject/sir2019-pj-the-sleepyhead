@@ -329,7 +329,7 @@ class SampleApplication(Base.AbstractApplication):
         count = 0
         self.genre = None
         while not self.genre and count < 2:
-            count +=1
+            count += 1
             self.setAudioContext("answer_genre")
             self.startListening()
             self.nameLock.acquire(timeout=5)
@@ -389,10 +389,7 @@ class SampleApplication(Base.AbstractApplication):
                 if count < 2:
                     self.sayAnimated("Sorry, I didn't catch your answer. Can you repeat it?")
                 else:
-                    self.sayAnimated(
-                        self.speed
-                        + "I suppose you fell asleep.. Good night, sweet dreams"
-                    )
+                    self.sayAnimated(self.speed + "I suppose you fell asleep.. Good night, sweet dreams")
                     self.doGesture("animations/Stand/Gestures/BowShort_1")
             self.speechLock.acquire()
 
