@@ -11,6 +11,9 @@ class SampleApplication(Base.AbstractApplication):
 
     # Pass the required Dialogflow parameters (add your Dialogflow parameters)
     def init_settings(self):
+        """
+        Initialize important settings
+        """
         self.setDialogflowKey("nao-asipei-148b2e2fe841.json")
         self.setDialogflowAgent("nao-asipei")
         self.speed = "\\rspd=80\\"
@@ -25,10 +28,19 @@ class SampleApplication(Base.AbstractApplication):
         self.nameLock = Semaphore(0)
 
     def init_stories(self):
+        """
+        Read the stories from the file "fables.json" and initialize the dataset.
+        """
         with open("fables.json") as file:
             self.dataset = json.load(file)["stories"]
 
     def select_story(self, genre):
+        """
+        Initialize the story story given the genre
+
+        Keyword arguments:
+        Genre -- Genre of the story
+        """
         genre = genre.lower()
         np.random.shuffle(self.dataset)
         for story in self.dataset:
@@ -43,9 +55,15 @@ class SampleApplication(Base.AbstractApplication):
         self.story["story"] = self.speed + "".join(processed_story)
 
     def init_gesture_list(self):
+        """
+        Initialize the gesture list from the dictionary
+        """
         self.gesture_list = list(self.gesture_to_probability.keys())
 
     def init_gestures(self):
+        """
+        Initialize the Gestures dictionaries and categorize them in 5 categories that represent the sentiment.
+        """
         self.gesture_to_probability = {
             "animations/Stand/Emotions/Negative/Fearful_1": -2,
             "animations/Stand/BodyTalk/Speaking/BodyTalk_18": -1,
@@ -184,6 +202,10 @@ class SampleApplication(Base.AbstractApplication):
         ]
 
     def init_leds_gestures(self):
+        """
+        Initialize the LEDs dictionaries.
+        """
+
         self.led_gesture = {
             "anger": "red",
             "surprise": "yellow",
@@ -211,6 +233,13 @@ class SampleApplication(Base.AbstractApplication):
         }
 
     def tell_stories(self, genre):
+        """
+        Command the robot to tell a story based on the genre
+
+        Keyword arguments:
+        Genre -- Genre of the story
+        """
+
         # We have his name and the kind of story. Init story
         self.select_story(genre)
         # Get when we start telling the story
@@ -237,7 +266,18 @@ class SampleApplication(Base.AbstractApplication):
         self.speechLock.acquire()
 
     def chooseGesture(self, sentence):
-        # Use an epsilon greedy policy. Meaning we will choose the given polarity a subjetivity porcent of the time.
+        """
+        Selects a gesture and LED color given the sentence.
+        It analyzes the sentiment of the sentence and create a distribution
+        to select the category over which the choose will be chosen
+
+        Keyword arguments:
+        Sentece -- Sentence of the story
+
+        Returns a Gesture name and a LED color matching the sentiment
+        """
+        # Use an epsilon greedy policy kind of.
+        # Meaning we will choose the given polarity a subjetivity porcent of the time.
         polarity, subjectivity = sentence.sentiment
         category = 0
         # Invert subjectivity
@@ -315,7 +355,6 @@ class SampleApplication(Base.AbstractApplication):
                 else:
                     self.sayAnimated("Sorry, I didn't catch your name, but I will tell you a story anyway")
                     self.name = ""
-            # self.name = "Bob"  # Change this please
             self.speechLock.acquire()
 
         self.sayAnimated(
